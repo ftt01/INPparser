@@ -9,10 +9,11 @@ import java.util.List;
 
 public class testMain {
     public static void main(String[]args) throws ConfigurationException {
-        INPparser testReader = new INPparser("file.ini", "OPTIONS");
+        INPparser testReader = new INPparser("testFile.inp");
 
-        LinkedHashMap<String, List<String>> testReturn;
+        LinkedHashMap<String, List<String>> testRead;
 
-        testReturn = testReader.reader();
+        testRead = testReader.reader("OPTIONS");
+        testReader.writer(testRead,"REPORT");
     }
 }
