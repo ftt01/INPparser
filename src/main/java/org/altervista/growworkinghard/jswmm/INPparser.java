@@ -1,7 +1,6 @@
 package org.altervista.growworkinghard.jswmm;
 
 import org.apache.commons.configuration2.HierarchicalConfiguration;
-import org.apache.commons.configuration2.INIConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.Parameters;
 import org.apache.commons.configuration2.ex.ConfigurationException;
@@ -37,12 +36,12 @@ public class INPparser {
     public LinkedHashMap<String, List<String>> reader() throws ConfigurationException {
 
         Parameters params = new Parameters();
-        FileBasedConfigurationBuilder<INIConfiguration> builder =
-                new FileBasedConfigurationBuilder<INIConfiguration>(INIConfiguration.class)
+        FileBasedConfigurationBuilder<INPConfiguration> builder =
+                new FileBasedConfigurationBuilder<INPConfiguration>(INPConfiguration.class)
                         .configure(params.ini()
                                 .setFileName(file));
 
-        INIConfiguration config = builder.getConfiguration();
+        INPConfiguration config = builder.getConfiguration();
         HierarchicalConfiguration<ImmutableNode> sectionNode = config.configurationAt(section);
 
         Iterator<String> keysIterator = sectionNode.getKeys();
@@ -51,16 +50,16 @@ public class INPparser {
 
         while (keysIterator.hasNext()) {
             String tmpKey = keysIterator.next();
-            //System.out.print(tmpKey);
+            System.out.print(tmpKey);
             String body = sectionNode.getString(tmpKey);
-            //System.out.print(body);
-            //String[] splittedBody = body.split("\\s+");
+            System.out.print(body);
+
             List<String> splittedBody = new ArrayList<>(Arrays.asList(body.split("\\s+")));
 
             table.put(tmpKey, splittedBody);
-            //for (Map.Entry<String, List<String>> entry : table.entrySet()) {
-            //    System.out.println(entry.getKey()+" : "+entry.getValue());
-            //}
+            for (Map.Entry<String, List<String>> entry : table.entrySet()) {
+                System.out.println(entry.getKey()+" : "+entry.getValue());
+            }
 
             //for(int i=0; i<values.length; i++) {
             //System.out.println("MONA" + values[i]);
