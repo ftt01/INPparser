@@ -44,7 +44,7 @@ public class INPConfiguration extends BaseHierarchicalConfiguration implements
     /**
      * The characters that signal the start of a comment line.
      */
-    protected static final String COMMENT_CHARS = ";";
+    protected static final String COMMENT_CHARS = "#";
 
     /**
      * The characters used to separate keys from values.
@@ -224,7 +224,7 @@ public class INPConfiguration extends BaseHierarchicalConfiguration implements
     }
 
     /**
-     * Reads the content of an INI file from the passed in reader and creates a
+     * Reads the content of an INP file from the passed in reader and creates a
      * structure of builders for constructing the {@code ImmutableNode} objects
      * representing the data.
      *
@@ -322,21 +322,7 @@ public class INPConfiguration extends BaseHierarchicalConfiguration implements
     }
 
     /**
-     * Parse the value to remove the quotes and ignoring the comment. Example:
-     *
-     * <pre>
-     * &quot;value&quot; ; comment -&gt; value
-     * </pre>
-     *
-     * <pre>
-     * 'value' ; comment -&gt; value
-     * </pre>
-     * Note that a comment character is only recognized if there is at least one
-     * whitespace character before it. So it can appear in the property value,
-     * e.g.:
-     * <pre>
-     * C:\\Windows;C:\\Windows\\system32
-     * </pre>
+     * Parse the value to remove the quotes and ignoring the comment.
      *
      * @param val the value to be parsed
      * @param reader the reader (needed if multiple lines have to be read)
