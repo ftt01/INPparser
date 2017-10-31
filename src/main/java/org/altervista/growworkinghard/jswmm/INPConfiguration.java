@@ -49,7 +49,7 @@ public class INPConfiguration extends BaseHierarchicalConfiguration implements
     /**
      * The characters used to separate keys from values.
      */
-    protected static final String SEPARATOR_CHARS = "        ";
+    protected static final String SEPARATOR_CHARS = " ";
 
     /**
      * Constant for the line separator.

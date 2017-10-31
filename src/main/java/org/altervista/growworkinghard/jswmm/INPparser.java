@@ -78,7 +78,6 @@ public class INPparser {
             List<String> splittedBody = new ArrayList<>(Arrays.asList(body.split("\\s+")));
 
             table.put(tmpKey, splittedBody);
-            System.out.println(splittedBody);
         }
 
         return table;
@@ -94,7 +93,7 @@ public class INPparser {
 
         while (keysIterator.hasNext()) {
             String tmpKey = keysIterator.next();
-            String tableValues = String.join("        ", table.get(tmpKey));
+            String tableValues = String.join("\t\t", table.get(tmpKey));
 
             sectionNode.setProperty(tmpKey, tableValues);
         }
