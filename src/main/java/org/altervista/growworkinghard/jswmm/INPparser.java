@@ -41,6 +41,8 @@ public class INPparser {
 
     private String file;
 
+    private boolean override = false;
+
     private FileBasedConfigurationBuilder<INPConfiguration> writeBuilder;
 
     private File fileObject;
@@ -55,8 +57,9 @@ public class INPparser {
         writeBuilder = buildNode();
     }
 
-    public INPparser(String templateFile, String file) throws IOException {
+    public INPparser(String templateFile, String file, boolean override) throws IOException {
         this.file = file;
+        this.override = override;
         this.fileObject = new File(file);
         File templateFileObject = new File(templateFile);
         writeBuilder = buildNode(templateFileObject);
@@ -127,15 +130,23 @@ public class INPparser {
         writeBuilder.save();
     }
 
-    private FileBasedConfigurationBuilder<INPConfiguration> buildNode(File templateFile) throws IOException {
+    private FileBasedConfigurationBuilder<INPConfiguration> buildNode(File templateFile)
+            throws IOException {
 
-        while(!fileObject.createNewFile()) {
-            String fileNameWithOutExt = FilenameUtils.removeExtension(file);
-            String extensionFile = FilenameUtils.getExtension(file);
+        if(override){
+            while(!fileObject.createNewFile()) {
+                fileObject.delete();
+            }
+        }
+        else {
+            while(!fileObject.createNewFile()) {
+                String fileNameWithOutExt = FilenameUtils.removeExtension(file);
+                String extensionFile = FilenameUtils.getExtension(file);
 
-            String oldFileName = fileNameWithOutExt + "_mod_" + timeStamp + "." + extensionFile;
-            File oldFileObject = new File(oldFileName);
-            fileObject.renameTo(oldFileObject);
+                String oldFileName = fileNameWithOutExt + "_mod_" + timeStamp + "." + extensionFile;
+                File oldFileObject = new File(oldFileName);
+                fileObject.renameTo(oldFileObject);
+            }
         }
 
         if (!templateFile.equals(fileObject)){
