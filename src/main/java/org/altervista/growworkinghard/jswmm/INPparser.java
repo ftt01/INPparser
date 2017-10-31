@@ -51,12 +51,24 @@ public class INPparser {
 
     private String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
 
+    /**
+     * Basic constructor
+     * @param file
+     * @throws IOException
+     */
     public INPparser(String file) throws IOException {
         this.file = file;
         this.fileObject = new File(file);
         writeBuilder = buildNode();
     }
 
+    /**
+     * Writer constructor
+     * @param templateFile
+     * @param file
+     * @param override
+     * @throws IOException
+     */
     public INPparser(String templateFile, String file, boolean override) throws IOException {
         this.file = file;
         this.override = override;
@@ -82,6 +94,16 @@ public class INPparser {
         this.file = file;
     }
 
+    /**
+     * Reader method.
+     * Creates a new ImmutableNode from the section and reads all the
+     * data from the section passed as parameter.
+     *
+     * @param section
+     * @return LinkedHashMap with section data
+     * @throws ConfigurationException
+     * @throws IOException
+     */
     public LinkedHashMap<String, List<String>> reader(String section)
             throws ConfigurationException, IOException {
 
@@ -109,6 +131,15 @@ public class INPparser {
         return table;
     }
 
+    /**
+     * Writer method.
+     * Takes a LinkedHashMap data and write it into the specified section of the file.
+     *
+     * @param table
+     * @param section
+     * @throws ConfigurationException
+     * @throws IOException
+     */
     public void writer(LinkedHashMap<String, List<String>> table, String section)
             throws ConfigurationException, IOException {
 
@@ -126,6 +157,11 @@ public class INPparser {
         }
     }
 
+    /**
+     * Save the entire modified file.
+     *
+     * @throws ConfigurationException
+     */
     public void saveWroteData() throws ConfigurationException {
         writeBuilder.save();
     }
@@ -158,6 +194,12 @@ public class INPparser {
                         .setFileName(file));
     }
 
+    /**
+     * Build the ImmutableNode from file.
+     *
+     * @return the builded ImmutableNode
+     * @throws IOException
+     */
     private FileBasedConfigurationBuilder<INPConfiguration> buildNode() throws IOException {
 
         return new FileBasedConfigurationBuilder<>(INPConfiguration.class)
