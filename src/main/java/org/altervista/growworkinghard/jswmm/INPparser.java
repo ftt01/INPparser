@@ -67,6 +67,8 @@ public class INPparser {
 
         Iterator<String> keysIterator = sectionNode.getKeys();
 
+        //while (keysIterator.hasNext()) System.out.println(keysIterator.next());
+
         LinkedHashMap<String, List<String>> table = new LinkedHashMap<>();
 
         while (keysIterator.hasNext()) {
@@ -76,6 +78,7 @@ public class INPparser {
             List<String> splittedBody = new ArrayList<>(Arrays.asList(body.split("\\s+")));
 
             table.put(tmpKey, splittedBody);
+            System.out.println(splittedBody);
         }
 
         return table;
@@ -86,8 +89,14 @@ public class INPparser {
         INPConfiguration config = builder.getConfiguration();
         HierarchicalConfiguration<ImmutableNode> sectionNode = config.configurationAt(section, true);
 
-        for (String tmpKey : table.keySet()) {
-            sectionNode.setProperty(tmpKey, table.get(tmpKey));
+        Set<String> keys = table.keySet();
+        Iterator<String> keysIterator = keys.iterator();
+
+        while (keysIterator.hasNext()) {
+            String tmpKey = keysIterator.next();
+            String tableValues = String.join("        ", table.get(tmpKey));
+
+            sectionNode.setProperty(tmpKey, tableValues);
         }
 
         builder.save();

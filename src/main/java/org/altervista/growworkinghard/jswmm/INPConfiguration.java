@@ -44,12 +44,12 @@ public class INPConfiguration extends BaseHierarchicalConfiguration implements
     /**
      * The characters that signal the start of a comment line.
      */
-    protected static final String COMMENT_CHARS = ";;";
+    protected static final String COMMENT_CHARS = ";";
 
     /**
      * The characters used to separate keys from values.
      */
-    protected static final String SEPARATOR_CHARS = " ";
+    protected static final String SEPARATOR_CHARS = "        ";
 
     /**
      * Constant for the line separator.
@@ -70,7 +70,7 @@ public class INPConfiguration extends BaseHierarchicalConfiguration implements
     /**
      * The separator used when writing an INP file.
      */
-    private String separatorUsedInOutput = "\t";
+    private String separatorUsedInOutput = "        ";
 
     /**
      * Create a new empty INP Configuration.
