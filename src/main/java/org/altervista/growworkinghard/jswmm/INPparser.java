@@ -19,17 +19,14 @@
 
 package org.altervista.growworkinghard.jswmm;
 
-import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.Parameters;
 import org.apache.commons.configuration2.ex.ConfigurationException;
-import org.apache.commons.configuration2.tree.ImmutableNode;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
+import java.io.PrintWriter;
+import java.nio.file.FileAlreadyExistsException;
 import java.util.*;
 
 /**
@@ -50,7 +47,7 @@ public class INPparser {
     public INPparser() {}
 
     /**
-     * Build the ImmutableNode from file string.
+     * Build the configuration file.
      *
      * @return the builded configuration
      * @throws ConfigurationException
@@ -68,16 +65,32 @@ public class INPparser {
         loadedFiles.put(file, config);
     }
 
-    /**
-     * Build the ImmutableNode from File type.
-     *
-     * @return the builded configuration
-     * @throws ConfigurationException
-     */
-    public void load(File file)
+    public String getProperty(String file, String section, String element, int propertyColumn){
+
+        String tmpStr = section + "." + element;
+
+        String body = (String) loadedFiles.get(file).getProperty(tmpStr);
+        List<String> splittedBody = new ArrayList<>(Arrays.asList(body.split("\\s+")));
+        return splittedBody.get(propertyColumn-1);
+    }
+
+    public void setProperty(String file, String section, String element, int propertyColumn, String value)
             throws ConfigurationException {
 
-        load(file.toString());
+        String tmpStr = section + "." + element;
+
+        String body = (String) loadedFiles.get(file).getProperty(tmpStr);
+        List<String> splittedBody = new ArrayList<>(Arrays.asList(body.split("\\s+")));
+
+        splittedBody.set(propertyColumn-1, value);
+
+        StringBuilder valuesBuilder = new StringBuilder();
+
+        for(int i=0; i<splittedBody.size(); i++){
+            valuesBuilder.append(String.format("%1$-25s", splittedBody.get(i)));
+        }
+
+        loadedFiles.get(file).setProperty(tmpStr, valuesBuilder.toString());
     }
 
     /**
@@ -88,38 +101,38 @@ public class INPparser {
     }
 
     /**
-     * Save the file with another name
+     * Save the file with another name, if the file exists it return an IOException
      */
-    public void save(String file, String newFile) throws ConfigurationException {
-        if(!buildedNodes.containsKey(file)){
-            loadINPTemplate(newFile);
-            loadedFiles.get(newFile).copy(loadedFiles.get(file));
+    public void saveAs(String file, String newFile) throws IOException, ConfigurationException {
+
+        createFile(newFile);
+        loadSWMMTemplate(newFile);
+        loadedFiles.get(newFile).copy(loadedFiles.get(file));
+        buildedNodes.get(newFile).save();
+    }
+
+    private void loadSWMMTemplate(String newFile) throws ConfigurationException, IOException {
+
+        writeSWMMTemplate(newFile);
+        load(newFile);
+    }
+
+    private void writeSWMMTemplate(String newFile) throws IOException {
+
+        PrintWriter printWriter = new PrintWriter(newFile);
+
+        printWriter.println("[TITLE]" + "\n");
+        printWriter.println("[OPTIONS]" + "\n");
+
+        printWriter.close();
+    }
+
+    private void createFile(String newFile) throws IOException, ConfigurationException {
+
+        File fileObject = new File(newFile);
+
+        if (!fileObject.createNewFile()) {
+            throw new FileAlreadyExistsException(newFile);
         }
-        buildedNodes.get(file).save();
-    }
-
-    private void loadINPTemplate(String newFile) throws ConfigurationException {
-        FileBasedConfigurationBuilder<INPConfiguration> builder;
-        builder = new FileBasedConfigurationBuilder<>(INPConfiguration.class)
-                .configure(params.ini());
-        INPConfiguration config = builder.getConfiguration();
-
-        buildedNodes.put(newFile, builder);
-        loadedFiles.put(newFile, config);
-    }
-
-    public String getProperty(String file, String section, String element, int propertyColumn){
-
-        String tmpStr = section + "." + element;
-
-        String body = (String) loadedFiles.get(file).getProperty(tmpStr);
-        List<String> splittedBody = new ArrayList<>(Arrays.asList(body.split("\\s+")));
-        return splittedBody.get(propertyColumn-1);
-    }
-
-    public void setProperty(String file, String section, String element, String value) throws ConfigurationException {
-
-        String tmpStr = section + "." + element;
-        loadedFiles.get(file).setProperty(tmpStr, value);
     }
 }

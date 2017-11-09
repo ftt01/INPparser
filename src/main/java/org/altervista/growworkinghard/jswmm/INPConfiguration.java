@@ -44,7 +44,7 @@ public class INPConfiguration extends BaseHierarchicalConfiguration implements
     /**
      * The characters that signal the start of a comment line.
      */
-    protected static final String COMMENT_CHARS = "#";
+    protected static final String COMMENT_CHARS = "";
 
     /**
      * The characters used to separate keys from values.
@@ -70,7 +70,7 @@ public class INPConfiguration extends BaseHierarchicalConfiguration implements
     /**
      * The separator used when writing an INP file.
      */
-    private String separatorUsedInOutput = "        ";
+    private String separatorUsedInOutput = " ";
 
     /**
      * Create a new empty INP Configuration.
@@ -315,9 +315,9 @@ public class INPConfiguration extends BaseHierarchicalConfiguration implements
      */
     private void writeProperty(PrintWriter out, String key, Object value, String separator)
     {
-        out.print(key);
+        out.print(String.format("%1$-25s", key));
         out.print(separator);
-        out.print(escapeValue(value.toString()));
+        out.print(String.format("%1$-25s", escapeValue(value.toString())));
         out.println();
     }
 

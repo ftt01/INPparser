@@ -28,9 +28,10 @@ public class testMain {
 
         //String test3 = object1.getProperty("2D.inp", "OPTIONS", "INFILTRATION", 1);
         //System.out.println(test3);
-        object1.setProperty("2D.inp", "OPTIONS", "INFILTRATION", "ciao");
+        object1.setProperty("2D.inp", "OPTIONS", "INFILTRATION", 1 , "Ciao");
 
         object1.save("2D.inp");
+        //object1.saveAs("2D.inp", "3D.inp");
 
         //object1.read("2D.inp", "OPTIONS", "key", "value");
         //object1.update("2D.inp", "OPTIONS", "key", "value");
