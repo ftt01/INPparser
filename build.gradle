@@ -1,4 +1,4 @@
-group 'org.altervista.growworkinghard.INPConfiguration'
+group 'org.altervista.growworkinghard.apiswmm'
 version '0.1'
 
 apply plugin: 'java'

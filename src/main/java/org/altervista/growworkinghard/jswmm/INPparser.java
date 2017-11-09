@@ -39,171 +39,87 @@ import java.util.*;
 
 public class INPparser {
 
-    private String file;
-
-    private boolean override = false;
-
-    private FileBasedConfigurationBuilder<INPConfiguration> writeBuilder;
-
-    private File fileObject;
-
     private Parameters params = new Parameters();
 
-    private String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+    private Map<String, FileBasedConfigurationBuilder<INPConfiguration>> buildedNodes = new LinkedHashMap<>();
+    private Map<String, INPConfiguration> loadedFiles = new LinkedHashMap<>();
 
     /**
      * Basic constructor
-     * @param file
-     * @throws IOException
      */
-    public INPparser(String file) throws IOException {
-        this.file = file;
-        this.fileObject = new File(file);
-        writeBuilder = buildNode();
-    }
+    public INPparser() {}
 
     /**
-     * Writer constructor
-     * @param templateFile
-     * @param file
-     * @param override
-     * @throws IOException
-     */
-    public INPparser(String templateFile, String file, boolean override) throws IOException {
-        this.file = file;
-        this.override = override;
-        this.fileObject = new File(file);
-        File templateFileObject = new File(templateFile);
-        writeBuilder = buildNode(templateFileObject);
-    }
-
-    public String getFile(){
-        return file;
-    }
-
-    public void setFile(String file) {
-        this.file = file;
-        this.fileObject = new File(file);
-    }
-
-    public String getSection(){
-        return file;
-    }
-
-    public void setSection(String file){
-        this.file = file;
-    }
-
-    /**
-     * Reader method.
-     * Creates a new ImmutableNode from the section and reads all the
-     * data from the section passed as parameter.
+     * Build the ImmutableNode from file string.
      *
-     * @param section
-     * @return LinkedHashMap with section data
-     * @throws ConfigurationException
-     * @throws IOException
-     */
-    public LinkedHashMap<String, List<String>> reader(String section)
-            throws ConfigurationException, IOException {
-
-        FileBasedConfigurationBuilder<INPConfiguration> readBuilder;
-        readBuilder = buildNode();
-
-        INPConfiguration config = readBuilder.getConfiguration();
-        HierarchicalConfiguration<ImmutableNode> sectionNode = config.configurationAt(section);
-
-        Iterator<String> keysIterator = sectionNode.getKeys();
-
-        //while (keysIterator.hasNext()) System.out.println(keysIterator.next());
-
-        LinkedHashMap<String, List<String>> table = new LinkedHashMap<>();
-
-        while (keysIterator.hasNext()) {
-            String tmpKey = keysIterator.next();
-
-            String body = sectionNode.getString(tmpKey);
-            List<String> splittedBody = new ArrayList<>(Arrays.asList(body.split("\\s+")));
-
-            table.put(tmpKey, splittedBody);
-        }
-
-        return table;
-    }
-
-    /**
-     * Writer method.
-     * Takes a LinkedHashMap data and write it into the specified section of the file.
-     *
-     * @param table
-     * @param section
-     * @throws ConfigurationException
-     * @throws IOException
-     */
-    public void writer(LinkedHashMap<String, List<String>> table, String section)
-            throws ConfigurationException, IOException {
-
-        INPConfiguration config = writeBuilder.getConfiguration();
-        HierarchicalConfiguration<ImmutableNode> sectionNode = config.configurationAt(section, true);
-
-        Set<String> keys = table.keySet();
-        Iterator<String> keysIterator = keys.iterator();
-
-        while (keysIterator.hasNext()) {
-            String tmpKey = keysIterator.next();
-            String tableValues = String.join("\t\t", table.get(tmpKey));
-
-            sectionNode.setProperty(tmpKey, tableValues);
-        }
-    }
-
-    /**
-     * Save the entire modified file.
-     *
+     * @return the builded configuration
      * @throws ConfigurationException
      */
-    public void saveWroteData() throws ConfigurationException {
-        writeBuilder.save();
-    }
+    public void load(String file)
+            throws ConfigurationException {
 
-    private FileBasedConfigurationBuilder<INPConfiguration> buildNode(File templateFile)
-            throws IOException {
-
-        if(override){
-            while(!fileObject.createNewFile()) {
-                fileObject.delete();
-            }
-        }
-        else {
-            while(!fileObject.createNewFile()) {
-                String fileNameWithOutExt = FilenameUtils.removeExtension(file);
-                String extensionFile = FilenameUtils.getExtension(file);
-
-                String oldFileName = fileNameWithOutExt + "_mod_" + timeStamp + "." + extensionFile;
-                File oldFileObject = new File(oldFileName);
-                fileObject.renameTo(oldFileObject);
-            }
-        }
-
-        if (!templateFile.equals(fileObject)){
-            FileUtils.copyFile(templateFile, fileObject);
-        }
-
-        return new FileBasedConfigurationBuilder<>(INPConfiguration.class)
+        FileBasedConfigurationBuilder<INPConfiguration> builder;
+        builder = new FileBasedConfigurationBuilder<>(INPConfiguration.class)
                 .configure(params.ini()
                         .setFileName(file));
+        INPConfiguration config = builder.getConfiguration();
+
+        buildedNodes.put(file, builder);
+        loadedFiles.put(file, config);
     }
 
     /**
-     * Build the ImmutableNode from file.
+     * Build the ImmutableNode from File type.
      *
-     * @return the builded ImmutableNode
-     * @throws IOException
+     * @return the builded configuration
+     * @throws ConfigurationException
      */
-    private FileBasedConfigurationBuilder<INPConfiguration> buildNode() throws IOException {
+    public void load(File file)
+            throws ConfigurationException {
 
-        return new FileBasedConfigurationBuilder<>(INPConfiguration.class)
-                    .configure(params.ini()
-                            .setFileName(file));
+        load(file.toString());
+    }
+
+    /**
+     * Save the file
+     */
+    public void save(String file) throws ConfigurationException {
+        buildedNodes.get(file).save();
+    }
+
+    /**
+     * Save the file with another name
+     */
+    public void save(String file, String newFile) throws ConfigurationException {
+        if(!buildedNodes.containsKey(file)){
+            loadINPTemplate(newFile);
+            loadedFiles.get(newFile).copy(loadedFiles.get(file));
+        }
+        buildedNodes.get(file).save();
+    }
+
+    private void loadINPTemplate(String newFile) throws ConfigurationException {
+        FileBasedConfigurationBuilder<INPConfiguration> builder;
+        builder = new FileBasedConfigurationBuilder<>(INPConfiguration.class)
+                .configure(params.ini());
+        INPConfiguration config = builder.getConfiguration();
+
+        buildedNodes.put(newFile, builder);
+        loadedFiles.put(newFile, config);
+    }
+
+    public String getProperty(String file, String section, String element, int propertyColumn){
+
+        String tmpStr = section + "." + element;
+
+        String body = (String) loadedFiles.get(file).getProperty(tmpStr);
+        List<String> splittedBody = new ArrayList<>(Arrays.asList(body.split("\\s+")));
+        return splittedBody.get(propertyColumn-1);
+    }
+
+    public void setProperty(String file, String section, String element, String value) throws ConfigurationException {
+
+        String tmpStr = section + "." + element;
+        loadedFiles.get(file).setProperty(tmpStr, value);
     }
 }
