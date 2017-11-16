@@ -34,22 +34,37 @@ import java.util.*;
  * @version 0.1
  */
 
+
+
 public class INPparser {
 
-    private Parameters params = new Parameters();
+    public class INPfile {
+        INPConfiguration configuration;
+        FileBasedConfigurationBuilder<INPConfiguration> builder;
 
-    private Map<String, FileBasedConfigurationBuilder<INPConfiguration>> buildedNodes = new LinkedHashMap<>();
-    private Map<String, INPConfiguration> loadedFiles = new LinkedHashMap<>();
+        INPfile(INPConfiguration configuration, FileBasedConfigurationBuilder<INPConfiguration> builder) {
+            this.configuration = configuration;
+            this.builder = builder;
+        }
+
+    }
+
+    private Parameters params;
+    private Map<String, INPfile> loadedFiles;
 
     /**
      * Basic constructor
      */
-    public INPparser() {}
+    public INPparser() {
+        loadedFiles = new LinkedHashMap<>();
+        params = new Parameters();
+    }
+
 
     /**
      * Build the configuration file.
      *
-     * @return the builded configuration
+     * @param file
      * @throws ConfigurationException
      */
     public void load(String file)
@@ -61,15 +76,23 @@ public class INPparser {
                         .setFileName(file));
         INPConfiguration config = builder.getConfiguration();
 
-        buildedNodes.put(file, builder);
-        loadedFiles.put(file, config);
+        loadedFiles.put(file, new INPfile(config, builder));
     }
 
-    public String getProperty(String file, String section, String element, int propertyColumn){
+    /**
+     * Getter that return the selected data.
+     *
+     * @param file where to read the data
+     * @param section where the data is located
+     * @param nameOfObject Id of the object
+     * @param propertyColumn
+     * @return
+     */
+    public String getProperty(String file, String section, String nameOfObject, int propertyColumn){
 
-        String tmpStr = section + "." + element;
+        String tmpStr = section + "." + nameOfObject;
 
-        String body = (String) loadedFiles.get(file).getProperty(tmpStr);
+        String body = (String) loadedFiles.get(file).configuration.getProperty(tmpStr);
         List<String> splittedBody = new ArrayList<>(Arrays.asList(body.split("\\s+")));
         return splittedBody.get(propertyColumn-1);
     }
@@ -79,7 +102,7 @@ public class INPparser {
 
         String tmpStr = section + "." + element;
 
-        String body = (String) loadedFiles.get(file).getProperty(tmpStr);
+        String body = (String) loadedFiles.get(file).configuration.getProperty(tmpStr);
         List<String> splittedBody = new ArrayList<>(Arrays.asList(body.split("\\s+")));
 
         splittedBody.set(propertyColumn-1, value);
@@ -87,17 +110,17 @@ public class INPparser {
         StringBuilder valuesBuilder = new StringBuilder();
 
         for(int i=0; i<splittedBody.size(); i++){
-            valuesBuilder.append(String.format("%1$-25s", splittedBody.get(i)));
+            valuesBuilder.append(String.format("%1$-17s", splittedBody.get(i)));
         }
 
-        loadedFiles.get(file).setProperty(tmpStr, valuesBuilder.toString());
+        loadedFiles.get(file).configuration.setProperty(tmpStr, valuesBuilder.toString());
     }
 
     /**
      * Save the file
      */
     public void save(String file) throws ConfigurationException {
-        buildedNodes.get(file).save();
+        loadedFiles.get(file).builder.save();
     }
 
     /**
@@ -105,14 +128,14 @@ public class INPparser {
      */
     public void saveAs(String file, String newFile) throws IOException, ConfigurationException {
 
-        createFile(newFile);
         loadSWMMTemplate(newFile);
-        loadedFiles.get(newFile).copy(loadedFiles.get(file));
-        buildedNodes.get(newFile).save();
+        loadedFiles.get(newFile).configuration.copy(loadedFiles.get(file).configuration);
+        loadedFiles.get(newFile).builder.save();
     }
 
     private void loadSWMMTemplate(String newFile) throws ConfigurationException, IOException {
 
+        createFile(newFile);
         writeSWMMTemplate(newFile);
         load(newFile);
     }
