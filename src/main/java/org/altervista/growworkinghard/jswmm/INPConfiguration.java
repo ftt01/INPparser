@@ -70,7 +70,7 @@ public class INPConfiguration extends BaseHierarchicalConfiguration implements
     /**
      * The separator used when writing an INP file.
      */
-    private String separatorUsedInOutput = " ";
+    private String separatorUsedInOutput = "";
 
     /**
      * Create a new empty INP Configuration.
@@ -315,9 +315,9 @@ public class INPConfiguration extends BaseHierarchicalConfiguration implements
      */
     private void writeProperty(PrintWriter out, String key, Object value, String separator)
     {
-        out.print(String.format("%1$-25s", key));
+        out.print(String.format("%1$-20s", key));
         out.print(separator);
-        out.print(String.format("%1$-25s", escapeValue(value.toString())));
+        out.print(String.format("%1$-20s", escapeValue(value.toString())));
         out.println();
     }
 
