@@ -13,7 +13,31 @@ public class testMain {
     public static void main(String[]args) throws ConfigurationException, IOException {
         INPparser object1 = new INPparser();
 
+        //EXAMPLE GET DATA FROM EXISTING FILE
         object1.load("2D.inp");
+
+        String test2 = object1.getProperty("2D.inp", "SUBCATCHMENTS", "r100a_2D", 5);
+        System.out.println(test2);
+
+        object1.setProperty("2D.inp", "SUBCATCHMENTS", "r101a_2D", 5, "26.0000");
+
+        object1.save("2D.inp");
+        //object1.saveAs("2D.inp", "5D.inp");
+
+        //EXAMPLE SET DATA TO NEW EMPTY FILE
+        //object1.fill("3D.inp");
+
+
+
+
+
+
+
+
+
+
+        //object1.load("3D.inp");
+
         //String test2 = object1.getProperty("2D.inp", "SUBCATCHMENTS", "r100a_2D", 5);
         //System.out.println(test2);
 
@@ -24,14 +48,13 @@ public class testMain {
         //String test3 = object1.getProperty("2D.inp", "OPTIONS", "INFILTRATION", 1);
         //System.out.println(test3);
 
-
-
         //String test3 = object1.getProperty("2D.inp", "OPTIONS", "INFILTRATION", 1);
         //System.out.println(test3);
-        object1.setProperty("2D.inp", "OPTIONS", "INFILTRATION", 1 , "Ciao");
+        //object1.setProperty("2D.inp", "SUBCATCHMENTS", "r100a_2D", 5, "26.0000");
 
-        object1.save("2D.inp");
-        //object1.saveAs("2D.inp", "3D.inp");
+        //object1.save("2D.inp");
+        //object1.save("3D.inp");
+        //object1.saveAs("2D.inp", "4D.inp");
 
         //object1.read("2D.inp", "OPTIONS", "key", "value");
         //object1.update("2D.inp", "OPTIONS", "key", "value");
