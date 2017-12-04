@@ -57,7 +57,8 @@ LINKS                   ALL
 [FILES]
 ;;Action   Parameter  Fname
 ;;-------- ---------- ------------------------------
-
+USE RAINFALL ciaomamma
+USE RUNOFF ciaopapa
 
 [EVAPORATION]
 ;;Other_Val

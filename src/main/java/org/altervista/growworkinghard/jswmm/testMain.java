@@ -19,9 +19,12 @@ public class testMain {
         String test2 = object1.getProperty("2D.inp", "SUBCATCHMENTS", "r100a_2D", 5);
         System.out.println(test2);
 
-        object1.setProperty("2D.inp", "SUBCATCHMENTS", "r101a_2D", 5, "26.0000");
+        //String test3 = object1.getProperty("2D.inp", "FILES", "USE", 2);
+        //System.out.println(test3);
 
-        object1.save("2D.inp");
+        //object1.setProperty("2D.inp", "SUBCATCHMENTS", "r101a_2D", 5, "26.0000");
+
+        //object1.save("2D.inp");
         //object1.saveAs("2D.inp", "5D.inp");
 
         //EXAMPLE SET DATA TO NEW EMPTY FILE
