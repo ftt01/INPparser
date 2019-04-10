@@ -4,5 +4,7 @@ gradle/
 gradlew
 gradlew.bat
 
+build/
 out/
 tmp/
+.idea/
