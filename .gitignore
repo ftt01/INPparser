@@ -1,10 +1,9 @@
-.idea/
-.gradle/
-gradle/
-gradlew
-gradlew.bat
+# Ignore Gradle project-specific cache directory
+.gradle
 
-build/
-out/
-tmp/
-.idea/
+# Ignore Gradle build output directory
+build
+data
+tmp
+out
+.idea
