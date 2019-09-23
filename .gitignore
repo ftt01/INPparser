@@ -4,6 +4,7 @@ gradle/
 gradlew
 gradlew.bat
 
+data/aob
 build/
 out/
 tmp/
