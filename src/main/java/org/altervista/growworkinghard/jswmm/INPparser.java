@@ -19,13 +19,12 @@
 
 package org.altervista.growworkinghard.jswmm;
 
+import com.github.geoframecomponents.jswmm.dataStructure.SWMMobject;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.Parameters;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.nio.file.FileAlreadyExistsException;
 import java.util.*;
 
@@ -33,8 +32,6 @@ import java.util.*;
  * @author ftt01 <dallatorre.daniele@gmail.com></>
  * @version 0.1
  */
-
-
 
 public class INPparser {
 
@@ -51,15 +48,16 @@ public class INPparser {
 
     private Parameters params;
     private Map<String, INPfile> loadedFiles;
+    private Map<String, List<String>> sectionLabels = new HashMap<>();
+    private Map<String, List<String>> sectionElements = new HashMap<>();
 
     /**
      * Basic constructor
      */
     public INPparser() {
-        loadedFiles = new LinkedHashMap<>();
-        params = new Parameters();
+        this.loadedFiles = new LinkedHashMap<>();
+        this.params = new Parameters();
     }
-
 
     /**
      * Build the configuration file.
@@ -67,8 +65,7 @@ public class INPparser {
      * @param file
      * @throws ConfigurationException
      */
-    public void load(String file)
-            throws ConfigurationException {
+    public void load(String file) throws ConfigurationException {
 
         FileBasedConfigurationBuilder<INPConfiguration> builder;
         builder = new FileBasedConfigurationBuilder<>(INPConfiguration.class)
@@ -94,7 +91,17 @@ public class INPparser {
 
         String body = (String) loadedFiles.get(file).configuration.getProperty(tmpStr);
         List<String> splittedBody = new ArrayList<>(Arrays.asList(body.split("\\s+")));
+
+        System.out.println(splittedBody.size());
+
         return splittedBody.get(propertyColumn-1);
+    }
+
+    private String cutCommentCharachter(String nameOfObject) {
+        if (nameOfObject.startsWith(";")){
+            return cutCommentCharachter(nameOfObject.substring(1));
+        }
+        return nameOfObject;
     }
 
     public void setProperty(String file, String section, String element, int propertyColumn, String value)
@@ -134,7 +141,6 @@ public class INPparser {
     }
 
     private void loadSWMMTemplate(String newFile) throws ConfigurationException, IOException {
-
         createFile(newFile);
         writeSWMMTemplate(newFile);
         load(newFile);
@@ -193,12 +199,67 @@ public class INPparser {
         printWriter.close();
     }
 
-    private void createFile(String newFile) throws IOException, ConfigurationException {
+    private void createFile(String newFile) throws IOException {
 
         File fileObject = new File(newFile);
 
         if (!fileObject.createNewFile()) {
             throw new FileAlreadyExistsException(newFile);
         }
+    }
+
+    private void readLines(String nameOfFile){
+        try{
+            FileInputStream fstream = new FileInputStream(nameOfFile);
+            // Get the object of DataInputStream
+            DataInputStream in = new DataInputStream(fstream);
+            BufferedReader br = new BufferedReader(new InputStreamReader(in));
+            String strLine;
+            boolean newSection = false;
+            //Read File Line By Line
+            String currentSection = null;
+            List<String> listElements = new ArrayList<>();
+            while ((strLine = br.readLine()) != null)   {
+                if (!strLine.isEmpty()) {
+                    if (strLine.startsWith("[")) {
+                        newSection = true;
+                        //Copy previous section elements before overwrite currentSection
+                        if (currentSection != null) {
+                            sectionElements.put(currentSection, listElements);
+                        }
+                        currentSection = strLine.substring(1,strLine.length()-1);
+                    }
+                    else {
+                        if (strLine.startsWith(";")) {
+                            if (newSection) {
+                                strLine = cutCommentCharachter(strLine);
+
+                                List<String> tmpArray = Arrays.asList(strLine.split("\\s+"));
+                                sectionLabels.put(currentSection, tmpArray);
+                                newSection = false;
+                            }
+                        }
+                        else {
+                            List<String> tmpArray = Arrays.asList(strLine.split("\\s+"));
+                            if (currentSection.equals("TITLE")){
+                                String str = String.join(" ", tmpArray);
+                                listElements.add(str);
+                            }
+                            else{
+                                listElements.add(tmpArray.get(0));
+                            }
+                        }
+                    }
+                }
+            }
+            //Close the input stream
+            in.close();
+        }catch (Exception e){//Catch exception if any
+            System.err.println("Error: " + e.getMessage());
+        }
+    }
+
+    public void parseSWMMinp(SWMMobject dataStr) {
+
     }
 }

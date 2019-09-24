@@ -1,25 +1,30 @@
 package org.altervista.growworkinghard.jswmm;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-
-import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
+import com.github.geoframecomponents.jswmm.dataStructure.SWMMobject;
 import org.apache.commons.configuration2.ex.ConfigurationException;
-
-import java.util.List;
+import java.io.IOException;
 
 public class testMain {
     public static void main(String[]args) throws ConfigurationException, IOException {
-        INPparser object1 = new INPparser();
 
+        SWMMobject dataStr;
+        INPparser object1;
+
+        dataStr = new SWMMobject();
+        object1 = new INPparser();
+        object1.load("./data/test/2D.inp");
+        object1.parseSWMMinp(dataStr);
+
+
+
+        //object1.readLines("./data/test/2D.inp");
         //EXAMPLE GET DATA FROM EXISTING FILE
-        object1.load("2D.inp");
+        //object1.load("./data/test/2D.inp");
 
-        String test2 = object1.getProperty("2D.inp", "SUBCATCHMENTS", "r100a_2D", 5);
-        System.out.println(test2);
+        //String test2 = object1.getProperty("./data/test/2D.inp", "RAINGAGES", ";;RG_ID", 2);
+        //System.out.println(test2);
 
-        //String test3 = object1.getProperty("2D.inp", "FILES", "USE", 2);
+        //String test3 = object1.getProperty("2D.inp", "OPTIONS", "FLOW_UNITS", 1);
         //System.out.println(test3);
 
         //object1.setProperty("2D.inp", "SUBCATCHMENTS", "r101a_2D", 5, "26.0000");
@@ -28,13 +33,8 @@ public class testMain {
         //object1.saveAs("2D.inp", "5D.inp");
 
         //EXAMPLE SET DATA TO NEW EMPTY FILE
+        //TODO SWMMdataStructure
         //object1.fill("3D.inp");
-
-
-
-
-
-
 
 
 
