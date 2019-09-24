@@ -19,7 +19,6 @@ repositories {
         url 'http://download.osgeo.org/webdav/geotools/'
     }
     mavenCentral()
-
     jcenter()
 }
 
@@ -30,7 +29,8 @@ dependencies {
     implementation group: 'org.apache.commons', name: 'commons-configuration2', version: '2.4'
     implementation group: 'commons-io', name: 'commons-io', version: '2.6'
 
-    compile group: 'com.github.geoframecomponents', name: 'jswmm', version: '0.1.1'
+    // https://mvnrepository.com/artifact/com.github.geoframecomponents/jswmm
+    implementation group: 'com.github.geoframecomponents', name: 'jswmm', version: '0.1.2'
     
     // Use JUnit test framework
     testImplementation 'junit:junit:4.12'
